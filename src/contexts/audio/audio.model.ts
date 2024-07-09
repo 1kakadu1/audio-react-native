@@ -1,11 +1,12 @@
-import { State, Track } from "react-native-track-player"
+import { IAudiData } from "models"
+import { State } from "react-native-track-player"
 
 export interface AudioPlayerContextType {
     duration: number
     isPlayerReady: boolean
     playBackState: State | undefined
     position: number
-    activeTrack: Track | undefined
+    activeTrack: IAudiData | undefined
     isWidgetPlayerHidden: boolean
     isWidgetOnBottom: boolean
     setIsWidgetPlayerHidden: (value: boolean) => void
@@ -13,5 +14,11 @@ export interface AudioPlayerContextType {
     clearPlaylist: VoidFunction
     skipToPosition: (pos: number, disabled?: boolean | null) => Promise<void>
     togglePlayback: (playback?: State | undefined, disabled?: boolean | null) => Promise<void>
-    skipToTrack: (index: number) => Promise<void>
+    skipToTrack: (index: number) => Promise<void>,
+    skipToNext: (disabled?: boolean | null)=> Promise<void>
+    skipToPrev: (disabled?: boolean | null)=> Promise<void>
+    isFirstTrack: boolean, 
+    isLastTrack: boolean,
+    indexTrack: number,
+    changePlaylist: ()=> void
   }

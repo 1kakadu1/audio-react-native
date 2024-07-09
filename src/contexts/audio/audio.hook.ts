@@ -1,4 +1,5 @@
-import { useEffect, useState } from 'react'
+import { IAudiData } from 'models'
+import { useEffect, useMemo, useRef, useState } from 'react'
 import TrackPlayer, {
     AppKilledPlaybackBehavior,
     Capability,
@@ -11,6 +12,7 @@ import TrackPlayer, {
     Event
   } from 'react-native-track-player'
 import { useAppDispatch, useAppSelector } from 'store'
+import { setAudioList, setAudioProgress, setCurrentTrack } from 'store/audio/audio.slice'
 
 export const capabilities = [Capability.Play, Capability.Pause, Capability.SkipToPrevious, Capability.SkipToNext]
 
@@ -28,20 +30,33 @@ export async function setupPlayer() {
 }
 
 
-async function addTrack(tracks: Track[], insetToStart?: boolean) {
+async function addTrack(tracks: IAudiData[], insetToStart?: boolean) {
   await TrackPlayer.add(tracks, insetToStart ? 0 : undefined)
   await TrackPlayer.setRepeatMode(RepeatMode.Off)
 }
 
 
 export const useAudioControl = () => {
-  const { audio: playlist, currentTrack: currentStateTrack, audioProgress } = useAppSelector(store => store.audio);
+  const { audio: playlist, currentTrack: currentStateTrack, audioProgress, isLoading } = useAppSelector(store => store.audio);
   const [isPlayerReady, setIsPlayerReady] = useState(false)
   const dispatch = useAppDispatch()
   const { state: playBackState } = usePlaybackState()
   const { position, duration } = useProgress(800);
-  const activeTrack = useActiveTrack()
-  console.log(activeTrack);
+  const activeTrack: IAudiData | null = useActiveTrack() as IAudiData;
+  const prevPlaylist  = useRef<IAudiData[] | null>(null);
+
+  const indexTrack = useMemo(()=>{
+    return playlist.findIndex(item => item.id === activeTrack?.id);
+  }, [activeTrack, playlist]);
+
+  const isLastTrack = useMemo(()=>{
+    return indexTrack === playlist.length - 1;
+  }, [activeTrack, indexTrack, playlist])
+
+  const isFirstTrack = useMemo(()=>{
+    return indexTrack === 0;
+  }, [activeTrack, indexTrack, playlist])
+
   const skipToPosition = async (pos: number, disabled?: boolean | null) => {
     if (!disabled) {
       await TrackPlayer.seekTo(pos)
@@ -64,31 +79,48 @@ export const useAudioControl = () => {
     }
   }
 
-  const skipToTrack = async (index: number) => {
+  const skipToTrack = async (index: number, isPlayStart = true) => {
     const queue = await TrackPlayer.getQueue()
     const nextTrack = queue[index]
     await TrackPlayer.skip(index, audioProgress[nextTrack?.id] ?? 0)
-    if (playBackState) {
+    if (playBackState && isPlayStart) {
       await TrackPlayer.play()
     }
   }
 
-  async function setup(tracks: Track[]) {
-    const isSetup = await setupPlayer()
+  const skipToPrev = async (disabled?: boolean | null) => {
+    if (!disabled) {
+      const queue = await TrackPlayer.getQueue()
+      const id = queue[queue.findIndex((item) => item.id === activeTrack?.id) - 1].id
+      await TrackPlayer.skipToPrevious(audioProgress[id] ?? 0)
+    }
+  }
 
+  const skipToNext = async (disabled?: boolean | null) => {
+    if (!disabled) {
+      const queue = await TrackPlayer.getQueue()
+      const id = queue[queue.findIndex((item) => item.id === activeTrack?.id) + 1].id
+      await TrackPlayer.skipToNext(audioProgress[id] ?? 0)
+    }
+  }
+
+  async function setup(tracks: IAudiData[], autoPlay: boolean = false) {
+    const isSetup = await setupPlayer()
     if (isSetup) {
+      await TrackPlayer.stop()
       await TrackPlayer.reset()
       await addTrack(tracks)
       const trackIndex = playlist.findIndex((item) => item.id === currentStateTrack)
-      if (trackIndex > -1) {
       
+      if (trackIndex > -1 && autoPlay) {
         await skipToTrack(trackIndex)
       }
       if (trackIndex > -1 && trackIndex === 0 && currentStateTrack) {
         await TrackPlayer.seekTo(audioProgress[currentStateTrack] ?? 0)
       }
+    } else{
+      //console.log("ERROR SETUP")
     }
-
     setIsPlayerReady(isSetup)
   }
 
@@ -96,20 +128,33 @@ export const useAudioControl = () => {
     if (isPlayerReady) {
       await TrackPlayer.stop()
       await TrackPlayer.reset()
-    //   dispatch(setPlaylist([]))
+      dispatch(setAudioList([]))
       setIsPlayerReady(false)
     }
   }
 
-  useEffect(() => {
-    if (playlist.length) {
+  const changePlaylist = ()=>{
+    if (playlist.length && JSON.stringify(playlist) !== JSON.stringify(prevPlaylist.current)) {
       const tracks = playlist.map((item) => ({
         ...item,
-        //artwork: item?.image ?? require('assets/images/empty-image.jpeg'),
+        artwork: item?.image || undefined,
+        image: item.image,
         url: item.previews['preview-hq-mp3'] || item.previews['preview-hq-ogg'],
       }))
-      setup(tracks as unknown as Track[])
+      prevPlaylist.current = playlist;
+      setup(tracks)
     }
+  }
+
+
+  useEffect(()=>{
+    if(currentStateTrack && activeTrack && currentStateTrack !== activeTrack.id){
+      setCurrentTrack(activeTrack.id)
+    }
+  }, [activeTrack?.id])
+
+  useEffect(()=>{
+    changePlaylist();
   }, [playlist])
 
   return {
@@ -117,10 +162,16 @@ export const useAudioControl = () => {
     clearPlaylist,
     position, 
     duration,
-    activeTrack,
+    activeTrack: activeTrack as IAudiData | undefined,
     playBackState,
     togglePlayback,
     skipToPosition,
-    skipToTrack
+    skipToTrack,
+    skipToPrev,
+    skipToNext,
+    changePlaylist,
+    isLastTrack,
+    isFirstTrack,
+    indexTrack
   }
 }

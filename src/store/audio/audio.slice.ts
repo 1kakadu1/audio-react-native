@@ -1,6 +1,6 @@
 import { createSlice } from '@reduxjs/toolkit'
 import type { PayloadAction } from '@reduxjs/toolkit'
-import { INITIAL_STATE, SLICE_NAME } from './audio.const'
+import { AUDIO_MOCK, INITIAL_STATE, SLICE_NAME } from './audio.const'
 import { IAudiData } from '../../models/audio'
 import { getAudioList } from './audio.thunk'
 
@@ -8,6 +8,9 @@ export const audioSlice = createSlice({
     name: SLICE_NAME,
     initialState: INITIAL_STATE,
     reducers: {
+      setAudioLoading: (state,  action: PayloadAction<boolean>)=>{
+        state.isLoading = action.payload
+      },
       setAudioList: (state,  action: PayloadAction<IAudiData[]>) => {
         state.audio = action.payload;
       },
@@ -23,7 +26,10 @@ export const audioSlice = createSlice({
         state.isLoading = true
       })
       builder.addCase(getAudioList.fulfilled, (state, { payload }) => {
-        state.audio = payload;
+        state.audio = [
+        ...AUDIO_MOCK,
+        ...payload
+        ];
         state.isLoading = false
       })
       builder.addCase(getAudioList.rejected, (state, { payload }) => {
@@ -33,6 +39,6 @@ export const audioSlice = createSlice({
     }
   })
 
-  export const { setAudioList , setAudioProgress, setCurrentTrack } = audioSlice.actions
+  export const { setAudioList , setAudioProgress, setCurrentTrack, setAudioLoading } = audioSlice.actions
   
   export default audioSlice.reducer

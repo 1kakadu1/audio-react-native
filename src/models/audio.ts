@@ -1,3 +1,5 @@
+import { Track } from "react-native-track-player";
+
 export type AudioType = "waw" | "mp3" | "ogg";
 
 export interface IAudioSoundPreview{
@@ -7,14 +9,16 @@ export interface IAudioSoundPreview{
     "preview-lq-ogg": string
 }
 
-export interface IAudiData{
+export interface IAudiData extends Track{
     id: number,
     url: string,
     name: string,
     tags: string[],
     description: string,
-    type: AudioType,
+    typeAudio: AudioType,
     duration: number,
     download: string,
-    previews: IAudioSoundPreview
+    previews: IAudioSoundPreview,
+    image?: string,
+    artwork?: string
 } 

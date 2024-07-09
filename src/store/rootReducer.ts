@@ -1,5 +1,6 @@
 import { combineReducers } from "@reduxjs/toolkit"
 import  audio from './audio/audio.slice';
+import  search from './search/search.slice';
 
 import { PersistConfig, persistReducer, persistStore } from 'redux-persist'
 import AsyncStorage from '@react-native-async-storage/async-storage'
@@ -11,7 +12,8 @@ const persistConfig: PersistConfig<RootState> = {
 }
 
 export const rootReducer = combineReducers({
-    audio
+    audio,
+    search,
 })
 
 export const persistedReducer = persistReducer(persistConfig, rootReducer)

@@ -5,10 +5,17 @@ import { formatSecondsToTime } from '../../utils/format.utils';
 import { useNavigation } from '@react-navigation/native';
 import { Navigation, ScreenName } from '../../navigation/navigation.model';
 import AudioIcon from "assets/svg/audio.svg";
-import DownLoadIcon from "assets/svg/download.svg";
+import PauseIcon from "assets/svg/pause.svg";
+import PlayIcon from "assets/svg/play.svg";
+import { State } from 'react-native-track-player';
+import { useMemo } from 'react';
+import { useAudioPlayerContext } from 'contexts/audio/audio.context';
+export const CardAudio = ({ audio, active }:{audio: IAudiData, active?: number | null})=>{
+    const  {playBackState, activeTrack } = useAudioPlayerContext()
 
-export const CardAudio = ({ audio }:{audio: IAudiData})=>{
-
+    const isPlay = useMemo(()=>{
+      return audio.id === activeTrack?.id && playBackState === State.Playing
+    }, [audio.id, activeTrack?.id, playBackState])
     const navigate = useNavigation<Navigation>();
     const gotoAudio = ()=>{
       navigate.navigate(ScreenName.audio, {
@@ -22,17 +29,22 @@ export const CardAudio = ({ audio }:{audio: IAudiData})=>{
             <AudioIcon width={54} height={54} fill={"#000"} style={styles.image}/>
           </View>
           <View style={styles.body}>
-            <Text>
+            <Text numberOfLines={1}>
               {audio.name.replace("."+audio.type,"")}
             </Text>
-            <Text numberOfLines={1}>в
-              {audio.description}
-            </Text>
+            {audio.description && audio.description !== "" &&
+                <Text numberOfLines={1} style={styles.description}>
+                    {audio.description}
+                </Text>
+            }
           </View>
           <View style={styles.footer}>
             <Text>{formatSecondsToTime(Math.floor(audio.duration),true)}</Text>
             <TouchableOpacity style={styles.actionDowload}>
-              <DownLoadIcon width={32} height={32} />
+              {
+                isPlay ?  <PauseIcon width={32} height={32} color={'red'}/> : <PlayIcon width={32} height={32} color={'red'} />
+              }
+              {/* <DownLoadIcon width={32} height={32} /> */}
             </TouchableOpacity>
           </View>
 

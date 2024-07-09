@@ -24,10 +24,15 @@ export default StyleSheet.create({
       flex: 1,
       paddingRight: 10,
     },
+    description:{
+      fontSize: 12
+    },
     footer:{
         gap: 8,
         flexDirection: 'row',
-        alignItems: "center"
+        alignItems: "center",
+        justifyContent: 'flex-end',
+        width: 100
     },
     actionDowload:{
         height: 36,

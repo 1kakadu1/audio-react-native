@@ -1,20 +1,22 @@
-import { NativeStackNavigationProp } from "@react-navigation/native-stack";
+import { NativeStackNavigationProp, NativeStackScreenProps } from "@react-navigation/native-stack";
 import { IAudiData } from "../models";
 
 export enum ScreenName{
     home = "Home",
     about = "About",
-    audio = "Audio"
+    audio = "Audio",
+    search = "Search"
 }
 
 export type RootStackParamList = {
     [ScreenName.home]: undefined;
     [ScreenName.about]: { title: string };
     [ScreenName.audio]: { item: IAudiData };
+    [ScreenName.search]: undefined
 };
 
 
-export type IHomeScreenPropsHomeScreenNavigationProp = NativeStackNavigationProp<
+export type IHomeScreenPropsHomeScreenNavigationProp = NativeStackScreenProps<
   RootStackParamList,
   ScreenName.home
 >;

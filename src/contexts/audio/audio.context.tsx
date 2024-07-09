@@ -1,11 +1,10 @@
-import React, { createContext, FC, PropsWithChildren, useContext, useEffect, useState } from 'react'
-import { State, Track } from 'react-native-track-player'
-
+import React, { createContext, FC, PropsWithChildren, useContext, useEffect, useRef, useState } from 'react'
 import { useAppDispatch, useAppSelector } from 'store'
-import { View, Text } from 'react-native'
+import { View } from 'react-native'
 import { AudioPlayerContextType } from './audio.model'
 import { useAudioControl } from "./audio.hook"
 import { setAudioProgress } from 'store/audio/audio.slice'
+import { AudioWidget } from 'components/audio-widget/audio-widget.component'
 
 const AudioPlayerContext = createContext<AudioPlayerContextType | undefined>(undefined)
 
@@ -20,6 +19,8 @@ export const useAudioPlayerContext = () => {
 export const AudioPlayerProvider: FC<PropsWithChildren> = ({ children }) => {
   const [isWidgetPlayerHidden, setIsWidgetPlayerHidden] = useState(true)
   const [isWidgetOnBottom, setIsWidgetOnBottom] = useState(false)
+  const { audioProgress, currentTrack, audio } = useAppSelector(state => state.audio);
+  const isInit = useRef(false);
   const dispatch = useAppDispatch()
 
   const {
@@ -31,23 +32,35 @@ export const AudioPlayerProvider: FC<PropsWithChildren> = ({ children }) => {
     clearPlaylist,
     togglePlayback,
     skipToPosition,
-    skipToTrack
-  } = useAudioControl()
+    skipToTrack,
+    skipToPrev,
+    skipToNext,
+    isFirstTrack,
+    isLastTrack,
+    indexTrack,
+    changePlaylist
+  } = useAudioControl();
 
   useEffect(() => {
-    if (activeTrack?.id !== undefined && activeTrack?.id !== null && position > 3) {
+    if (activeTrack?.id !== undefined && activeTrack?.id !== null ) {
       dispatch(setAudioProgress({ id: activeTrack.id, progress: position }))
       if (duration && Math.ceil(position) >= duration) {
         setTimeout(() => dispatch(setAudioProgress({ id: activeTrack.id, progress: 0 })), 300)
       }
     }
-  }, [Math.floor(position / 3)])
+  }, [position])
 
   useEffect(() => {
-    if (playBackState !== State.Playing) {
-      setIsWidgetPlayerHidden(!isPlayerReady)
+    if(!isInit.current && audio.length > 0 && isPlayerReady){
+      const audioIndex = audio.findIndex(item => item.id === currentTrack);
+      if (!isInit.current && currentTrack && audioProgress[currentTrack] !== undefined && audioIndex !== -1) {
+        skipToTrack(audioIndex, false).then(()=>{
+          setIsWidgetPlayerHidden(false);
+        }).finally(()=> isInit.current = true);
+      }
     }
-  }, [isPlayerReady])
+
+  }, [isPlayerReady, currentTrack, audio])
 
 
   return (
@@ -65,15 +78,28 @@ export const AudioPlayerProvider: FC<PropsWithChildren> = ({ children }) => {
         clearPlaylist,
         togglePlayback,
         skipToPosition,
-        skipToTrack
+        skipToTrack,
+        skipToNext,
+        skipToPrev,
+        isFirstTrack,
+        isLastTrack,
+        indexTrack,
+        changePlaylist
       }}
     >
-      {children}
-      {!isWidgetPlayerHidden && (
-        <View>
-            <Text>Виджет</Text>
-        </View>
-      )}
+      <View style={{flex: 1, overflow: "hidden"}}>
+        {children}
+        {/* {!isWidgetPlayerHidden && ( */}
+            <AudioWidget 
+              isWidgetPlayerHidden={isWidgetPlayerHidden} 
+              setIsWidgetPlayerHidden={setIsWidgetPlayerHidden}
+              activeTrack={activeTrack}
+              position={position}
+              togglePlayback={togglePlayback}
+              playBackState={playBackState} 
+            />
+        {/* )} */}
+      </View>
     </AudioPlayerContext.Provider>
   )
 }

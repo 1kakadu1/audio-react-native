@@ -1,44 +1,40 @@
 
 import { StatusBar } from "expo-status-bar"
-import { View, Text } from "react-native-ui-lib"
-import {  NativeStackNavigationProp } from '@react-navigation/native-stack';
-import { Button, FlatList } from "react-native";
-import { RootStackParamList, ScreenName } from "../../navigation/navigation.model";
+import { View } from "react-native-ui-lib"
+import { FlatList } from "react-native";
+import { IHomeScreenPropsHomeScreenNavigationProp } from "../../navigation/navigation.model";
 import { useAppDispatch, useAppSelector } from "../../store";
 import { useEffect } from "react";
 import { getAudioList } from "../../store/audio/audio.thunk";
 import { IAudiData } from "../../models/audio";
 import { CardAudio } from "../../components/card/card-audio.component";
-import { LayoutBase } from "components/layouts/layoute-base";
+import { useAudioPlayerContext } from "contexts/audio/audio.context";
 
-interface IHomeScreenProps {
-    navigation: NativeStackNavigationProp<RootStackParamList, ScreenName.home>;
-}
 
-export function HomeScreen( { navigation }: IHomeScreenProps) {
-    const {  isLoading, audio } = useAppSelector((state) => state.audio);
+export function HomeScreen( { navigation, route }: IHomeScreenPropsHomeScreenNavigationProp) {
+    const {  isLoading, audio, currentTrack } = useAppSelector((state) => state.audio);
+    const { search } = useAppSelector(state => state.search);
+    const { isWidgetPlayerHidden } = useAudioPlayerContext();
     const dispath = useAppDispatch();
 
     useEffect(()=>{
+        console.log(isLoading, search, "->screen home")
         if(!isLoading){
-           dispath(getAudioList("piano")) 
+           dispath(getAudioList(search || "piano")) 
         }
     }, [])
 
     return (
-        <View>
+        <View >
             <StatusBar style="auto" />
             
             <FlatList
+                contentContainerStyle={{paddingBottom: isWidgetPlayerHidden ? 0 : 80}}
                 data={audio}
-                renderItem={({item}: {item: IAudiData}) => <CardAudio audio={item}/>}
+                renderItem={({item}: {item: IAudiData}) => <CardAudio audio={item} active={currentTrack}/>}
                 keyExtractor={item => item.id.toString()}
-                //extraData={selectedId}
+                extraData={currentTrack}
             />
-            <Button
-                title="Go to About"
-                onPress={() => navigation.navigate(ScreenName.about, {title: ""})}
-            /> 
         </View>
     );
 }
