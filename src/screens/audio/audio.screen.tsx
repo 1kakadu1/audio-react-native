@@ -9,14 +9,16 @@ import { State } from "react-native-track-player";
 import NoteIcon from "assets/svg/note.svg";
 import Play from "assets/svg/play-second.svg";
 import Pause from "assets/svg/pause-second.svg";
+import Download from "assets/svg/download.svg";
+import Upload from "assets/svg/upload.svg";
 import Next from "assets/svg/next.svg";
 import Prev from "assets/svg/prev.svg";
 import styles, { SIZE_ICON } from "./audio.style";
 import Slider from "@react-native-community/slider";
 import { formatSecondsToTime } from "utils/format.utils";
 import { useAudioPlayerContext } from "contexts/audio/audio.context";
-import { AudioLayout } from "components/layouts/audio-layout";
 import {Image} from "react-native-expo-image-cache";
+import { useDownloadAudio } from "contexts/dowlnoad/dowload.hook";
 
 export type AudioScreenNavigationProp = NativeStackScreenProps<
   RootStackParamList,
@@ -40,10 +42,11 @@ export function AudioScreen({ route }: AudioScreenNavigationProp) {
       isLastTrack, 
        
     } = useAudioPlayerContext()
-    const { audio, audioProgress, currentTrack } = useAppSelector(state => state.audio);
+    const { audio, audioProgress, currentTrack, audioDownload } = useAppSelector(state => state.audio);
     const [positionInternal, setPositionInternal] = useState(0)
     const [isSliding, setIsSliding] = useState(false)
     const [disabledInternal, setDisabledInternal] = useState<boolean | null>(null)
+    const { download, downloadProgress } = useDownloadAudio();
     const isFirstRender = useRef(false);
 
     const dispatch = useAppDispatch();
@@ -97,7 +100,6 @@ export function AudioScreen({ route }: AudioScreenNavigationProp) {
       }
     }
     return (
-      // <AudioLayout route={route}>
         <View style={styles.container}>
             <StatusBar style="auto" />
             <View style={{width: "100%"}}>
@@ -147,7 +149,16 @@ export function AudioScreen({ route }: AudioScreenNavigationProp) {
             </View>
 
             <View style={styles.actions}>
-      
+              <View style={{width: "100%", alignItems: "center", justifyContent: "flex-end", flexDirection: "row" }}>
+                {
+                  activeTrack && downloadProgress[activeTrack?.id] && downloadProgress[activeTrack?.id] !== 100 ? <Text>{(downloadProgress[activeTrack?.id]*100).toFixed(0)}%</Text> : null
+                }
+                <TouchableOpacity onPress={()=>{
+                  activeTrack && download(activeTrack)
+                }}>
+                  { activeTrack && audioDownload[activeTrack?.id] ? <Upload width={30} height={30} /> : <Download width={30} height={30} />}  
+                </TouchableOpacity>
+              </View>
               <View style={styles.actions__nav}>
                 <TouchableOpacity style={styles.actions__nav__prev} onPress={onPrev}>
                   <Prev width={SIZE_ICON} height={SIZE_ICON} />
@@ -164,6 +175,5 @@ export function AudioScreen({ route }: AudioScreenNavigationProp) {
             </View>
 
         </View>
-      // </AudioLayout>
     );
 }

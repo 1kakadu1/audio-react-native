@@ -37,7 +37,7 @@ async function addTrack(tracks: IAudiData[], insetToStart?: boolean) {
 
 
 export const useAudioControl = () => {
-  const { audio: playlist, currentTrack: currentStateTrack, audioProgress, isLoading } = useAppSelector(store => store.audio);
+  const { audio: playlist, currentTrack: currentStateTrack, audioProgress, audioDownload } = useAppSelector(store => store.audio);
   const [isPlayerReady, setIsPlayerReady] = useState(false)
   const dispatch = useAppDispatch()
   const { state: playBackState } = usePlaybackState()
@@ -139,9 +139,10 @@ export const useAudioControl = () => {
         ...item,
         artwork: item?.image || undefined,
         image: item.image,
-        url: item.previews['preview-hq-mp3'] || item.previews['preview-hq-ogg'],
+        url: audioProgress[item.id] !== undefined ? audioDownload[item.id]?.file || item.previews['preview-hq-mp3'] : item.previews['preview-hq-mp3'] || item.previews['preview-hq-ogg'],
       }))
       prevPlaylist.current = playlist;
+      console.log(tracks)
       setup(tracks)
     }
   }

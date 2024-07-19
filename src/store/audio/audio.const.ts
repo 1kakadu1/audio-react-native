@@ -6,7 +6,8 @@ export const INITIAL_STATE: IAudioState = {
     currentTrack: null,
     isLoading: false,
     error: undefined,
-    audioProgress: {}
+    audioProgress: {},
+    audioDownload: {}
 }
   
 export const SLICE_NAME = "audio";

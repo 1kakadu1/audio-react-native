@@ -19,6 +19,9 @@ export const audioSlice = createSlice({
       },
       setCurrentTrack: (state, { payload }:  PayloadAction< number | null>) => {
         state.currentTrack = payload
+      },
+      addAudioDowload: (state, { payload }:  PayloadAction<IAudiData>) => {
+        state.audioDownload = {...state.audioDownload, [payload.id]: payload} 
       }
     },
     extraReducers:(builder) => {
@@ -39,6 +42,6 @@ export const audioSlice = createSlice({
     }
   })
 
-  export const { setAudioList , setAudioProgress, setCurrentTrack, setAudioLoading } = audioSlice.actions
+  export const { setAudioList , setAudioProgress, setCurrentTrack, setAudioLoading, addAudioDowload } = audioSlice.actions
   
   export default audioSlice.reducer

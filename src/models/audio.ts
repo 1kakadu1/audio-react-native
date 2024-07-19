@@ -20,5 +20,6 @@ export interface IAudiData extends Track{
     download: string,
     previews: IAudioSoundPreview,
     image?: string,
-    artwork?: string
+    artwork?: string,
+    file?: string
 } 
