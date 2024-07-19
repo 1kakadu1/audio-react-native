@@ -10,7 +10,6 @@ import { IAudiData } from "../../models/audio";
 import { CardAudio } from "../../components/card/card-audio.component";
 import { useAudioPlayerContext } from "contexts/audio/audio.context";
 
-
 export function HomeScreen( { navigation, route }: IHomeScreenPropsHomeScreenNavigationProp) {
     const {  isLoading, audio, currentTrack } = useAppSelector((state) => state.audio);
     const { search } = useAppSelector(state => state.search);
@@ -18,7 +17,6 @@ export function HomeScreen( { navigation, route }: IHomeScreenPropsHomeScreenNav
     const dispath = useAppDispatch();
 
     useEffect(()=>{
-        console.log(isLoading, search, "->screen home")
         if(!isLoading){
            dispath(getAudioList(search || "piano")) 
         }

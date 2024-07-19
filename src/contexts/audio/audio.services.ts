@@ -22,14 +22,21 @@ export async function playbackService() {
       TrackPlayer.play()
     })
     TrackPlayer.addEventListener(Event.RemoteNext, async () => {
-      console.log(Event.RemoteNext)
+     console.log(Event.RemoteNext)
      await setPosition()
+     const currentTrack = await TrackPlayer.getActiveTrack()
+     const queue = await TrackPlayer.getQueue()
+     const id = queue[queue.findIndex((item) => item.id === currentTrack?.id) + 1].id
+     await TrackPlayer.skipToNext(store.getState().audio.audioProgress[id] ?? 0)
 
     })
     TrackPlayer.addEventListener(Event.RemotePrevious, async () => {
       console.log(Event.RemotePrevious)
-     await setPosition()
-     
+      await setPosition()
+       const currentTrack = await TrackPlayer.getActiveTrack()
+       const queue = await TrackPlayer.getQueue()
+       const id = queue[queue.findIndex((item) => item.id === currentTrack?.id) - 1].id
+       await TrackPlayer.skipToPrevious(store.getState().audio.audioProgress[id] ?? 0)
     })
     TrackPlayer.addEventListener(Event.PlaybackActiveTrackChanged, async (event) => {
       console.log(Event.PlaybackActiveTrackChanged)

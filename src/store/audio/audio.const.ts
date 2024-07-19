@@ -32,7 +32,8 @@ export const  AUDIO_MOCK: IAudiData[] = [
           "preview-hq-ogg": AUDIO_MOCK_URL[0],
           "preview-lq-mp3": AUDIO_MOCK_URL[0],
           "preview-lq-ogg": AUDIO_MOCK_URL[0]
-        }
+        },
+        image: "https://firebasestorage.googleapis.com/v0/b/cofee-flutter.appspot.com/o/images%2Fpreview%2F800x800cc.jpg?alt=media&token=ae87affe-acea-46d3-9e2c-888ad944c0d7"
       },
       {
         id: 6666667,

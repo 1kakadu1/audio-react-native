@@ -146,6 +146,21 @@ export const useAudioControl = () => {
     }
   }
 
+  const hideNext = async (isFirst?: boolean, isLast?: boolean) => {
+    setTimeout(() => {
+      const filteredCapabilities = capabilities
+        .filter((item) => (isFirst ? item !== Capability.SkipToPrevious : item))
+        .filter((item) => (isLast ? item !== Capability.SkipToNext : item))
+      TrackPlayer.updateOptions({
+        capabilities: filteredCapabilities,
+        compactCapabilities: filteredCapabilities,
+        android: {
+          appKilledPlaybackBehavior: AppKilledPlaybackBehavior.StopPlaybackAndRemoveNotification,
+        },
+      })
+    })
+  }
+
 
   useEffect(()=>{
     if(currentStateTrack && activeTrack && currentStateTrack !== activeTrack.id){
@@ -156,6 +171,12 @@ export const useAudioControl = () => {
   useEffect(()=>{
     changePlaylist();
   }, [playlist])
+
+  useEffect(() => {
+    if (isPlayerReady) {
+      hideNext(isFirstTrack, isLastTrack)
+    }
+  }, [isFirstTrack, isLastTrack, isPlayerReady])
 
   return {
     isPlayerReady,

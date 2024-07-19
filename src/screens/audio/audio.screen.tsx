@@ -2,7 +2,7 @@ import { StatusBar } from "expo-status-bar"
 import { View, Text, TouchableOpacity } from "react-native"
 import { RootStackParamList, ScreenName } from "../../navigation/navigation.model";
 import { NativeStackScreenProps } from "@react-navigation/native-stack";
-import { useEffect, useRef, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { setCurrentTrack } from "store/audio/audio.slice";
 import { useAppDispatch, useAppSelector } from "store";
 import { State } from "react-native-track-player";
@@ -16,6 +16,7 @@ import Slider from "@react-native-community/slider";
 import { formatSecondsToTime } from "utils/format.utils";
 import { useAudioPlayerContext } from "contexts/audio/audio.context";
 import { AudioLayout } from "components/layouts/audio-layout";
+import {Image} from "react-native-expo-image-cache";
 
 export type AudioScreenNavigationProp = NativeStackScreenProps<
   RootStackParamList,
@@ -101,9 +102,21 @@ export function AudioScreen({ route }: AudioScreenNavigationProp) {
             <StatusBar style="auto" />
             <View style={{width: "100%"}}>
             <View style={styles.header}>
-              <View style={styles.preview}>
-                <NoteIcon width={240} height={240} fill="#000" />
-              </View>
+              {
+                activeTrack?.image ? (
+                  <Image 
+                  style={styles.image}
+                  uri={activeTrack?.image} 
+                  />
+                )
+                :
+                (
+                  <View style={styles.preview}>
+                    <NoteIcon width={240} height={240} fill="#000" />
+                  </View>
+                )
+              }
+
               <View>
                 <Text style={styles.title} numberOfLines={1}>{activeTrack?.name}</Text>
                 <Text style={styles.description} numberOfLines={2}> 

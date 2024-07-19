@@ -14,6 +14,14 @@ export default StyleSheet.create({
         borderColor: COLORS.border,
         marginBottom: 20
     },
+    image:{
+        alignItems: 'center',
+        justifyContent: 'center',
+        width: 280,
+        height: 280,
+        borderRadius: 20,
+        marginBottom: 20
+    },
     container:{
         paddingTop: 20,
         paddingHorizontal: 20,
@@ -25,7 +33,7 @@ export default StyleSheet.create({
         paddingBottom: 6,
         paddingTop: 12,
         textAlign: 'center',
-        fontWeight: 900,
+        //fontWeight: 900,
         fontSize: 22
     },
     description:{

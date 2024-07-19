@@ -8,9 +8,7 @@ export interface AudioPlayerContextType {
     position: number
     activeTrack: IAudiData | undefined
     isWidgetPlayerHidden: boolean
-    isWidgetOnBottom: boolean
     setIsWidgetPlayerHidden: (value: boolean) => void
-    setIsWidgetOnBottom: (value: boolean) => void
     clearPlaylist: VoidFunction
     skipToPosition: (pos: number, disabled?: boolean | null) => Promise<void>
     togglePlayback: (playback?: State | undefined, disabled?: boolean | null) => Promise<void>

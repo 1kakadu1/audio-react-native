@@ -32,7 +32,7 @@ const ActionPlayIcon = ({position, playBackState}:{position: number, playBackSta
 export const AudioWidget = ({isWidgetPlayerHidden, position ,togglePlayback, activeTrack , playBackState}: IAudioWidgetProps) =>{
     const translateY = useSharedValue(90);
     const init = useRef(false);
-    console.log(activeTrack?.name, playBackState)
+    //console.log(activeTrack)
     useEffect(()=>{
         init.current = true;
     }, [])

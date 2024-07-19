@@ -18,7 +18,6 @@ export const useAudioPlayerContext = () => {
 
 export const AudioPlayerProvider: FC<PropsWithChildren> = ({ children }) => {
   const [isWidgetPlayerHidden, setIsWidgetPlayerHidden] = useState(true)
-  const [isWidgetOnBottom, setIsWidgetOnBottom] = useState(false)
   const { audioProgress, currentTrack, audio } = useAppSelector(state => state.audio);
   const isInit = useRef(false);
   const dispatch = useAppDispatch()
@@ -73,8 +72,6 @@ export const AudioPlayerProvider: FC<PropsWithChildren> = ({ children }) => {
         activeTrack,
         isWidgetPlayerHidden,
         setIsWidgetPlayerHidden,
-        isWidgetOnBottom,
-        setIsWidgetOnBottom,
         clearPlaylist,
         togglePlayback,
         skipToPosition,
@@ -89,16 +86,14 @@ export const AudioPlayerProvider: FC<PropsWithChildren> = ({ children }) => {
     >
       <View style={{flex: 1, overflow: "hidden"}}>
         {children}
-        {/* {!isWidgetPlayerHidden && ( */}
-            <AudioWidget 
-              isWidgetPlayerHidden={isWidgetPlayerHidden} 
-              setIsWidgetPlayerHidden={setIsWidgetPlayerHidden}
-              activeTrack={activeTrack}
-              position={position}
-              togglePlayback={togglePlayback}
-              playBackState={playBackState} 
-            />
-        {/* )} */}
+        <AudioWidget 
+          isWidgetPlayerHidden={isWidgetPlayerHidden} 
+          setIsWidgetPlayerHidden={setIsWidgetPlayerHidden}
+          activeTrack={activeTrack}
+          position={position}
+          togglePlayback={togglePlayback}
+          playBackState={playBackState} 
+        />
       </View>
     </AudioPlayerContext.Provider>
   )
