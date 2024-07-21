@@ -132,18 +132,20 @@ export const useAudioControl = () => {
       setIsPlayerReady(false)
     }
   }
-
+  const setupPLaylist = (playlist: IAudiData[]) =>{
+    const tracks = playlist.map((item) => ({
+      ...item,
+      artwork: item?.image || undefined,
+      image: item.image,
+      url: audioProgress[item.id] !== undefined ? audioDownload[item.id]?.file || item.previews['preview-hq-mp3'] : item.previews['preview-hq-mp3'] || item.previews['preview-hq-ogg'],
+    }))
+    prevPlaylist.current = playlist;
+    console.log(tracks)
+    setup(tracks)
+  }
   const changePlaylist = ()=>{
     if (playlist.length && JSON.stringify(playlist) !== JSON.stringify(prevPlaylist.current)) {
-      const tracks = playlist.map((item) => ({
-        ...item,
-        artwork: item?.image || undefined,
-        image: item.image,
-        url: audioProgress[item.id] !== undefined ? audioDownload[item.id]?.file || item.previews['preview-hq-mp3'] : item.previews['preview-hq-mp3'] || item.previews['preview-hq-ogg'],
-      }))
-      prevPlaylist.current = playlist;
-      console.log(tracks)
-      setup(tracks)
+      setupPLaylist(playlist)
     }
   }
 

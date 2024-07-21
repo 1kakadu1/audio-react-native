@@ -19,6 +19,7 @@ import { formatSecondsToTime } from "utils/format.utils";
 import { useAudioPlayerContext } from "contexts/audio/audio.context";
 import {Image} from "react-native-expo-image-cache";
 import { useDownloadAudio } from "contexts/dowlnoad/dowload.hook";
+import { useNetInfo } from "@react-native-community/netinfo";
 
 export type AudioScreenNavigationProp = NativeStackScreenProps<
   RootStackParamList,
@@ -26,6 +27,7 @@ export type AudioScreenNavigationProp = NativeStackScreenProps<
 >;
 
 export function AudioScreen({ route }: AudioScreenNavigationProp) {
+    const { isConnected } = useNetInfo();
     const { 
       isPlayerReady, 
       position ,

@@ -6,24 +6,7 @@ import { IResponseApi } from '../models'
 export enum ApiErrors {
     NotFound = 'Ресурс не найден',
     UnknownError = 'Произошла непредвиденная ошибка',
-  }
-  
-  export enum ValidationErrors {
-    Required = 'Обязательное поле',
-    IncorrectEmailFormat = 'Проверьте правильность введенного email',
-  }
-  
-  export enum OriginalErrorMessages {
-    NotVerifiedStatus = 'User must have verified status',
-  }
-  
-  export enum FileErrorMessage {
-    DownloadError = 'При скачивании лекции произошла ошибка. Проверьте сетевое подключение и наличие свободного пространства на устройстве.',
-  }
-  
-  export enum PlayAudioErrorMessage {
-    PlayError = 'Не удалось воспроизвести лекцию. Повторно скачайте лекцию или обратитесь в поддержку.',
-  }
+}
   
 const axios = Axios.create()
 
