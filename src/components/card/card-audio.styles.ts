@@ -18,7 +18,7 @@ export default StyleSheet.create({
       alignItems: "center"
     },
     header:{
-
+      position: "relative"
     },
     body:{
       flex: 1,
@@ -37,6 +37,12 @@ export default StyleSheet.create({
     actionDowload:{
         height: 36,
         width: 36
+     },
+     upload:{
+      position: "absolute",
+      zIndex: 2,
+      bottom: 8,
+      right: 10
      }
     
   });

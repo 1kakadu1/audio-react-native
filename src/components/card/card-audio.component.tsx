@@ -10,9 +10,12 @@ import PlayIcon from "assets/svg/play.svg";
 import { State } from 'react-native-track-player';
 import { useMemo } from 'react';
 import { useAudioPlayerContext } from 'contexts/audio/audio.context';
-export const CardAudio = ({ audio, active }:{audio: IAudiData, active?: number | null})=>{
-    const  {playBackState, activeTrack } = useAudioPlayerContext()
+import Upload from "assets/svg/upload.svg";
+import { useAppSelector } from 'store';
 
+export const CardAudio = ({ audio, active }:{audio: IAudiData, active?: number | null})=>{
+    const { audioDownload } = useAppSelector(state => state.audio);
+    const  {playBackState, activeTrack } = useAudioPlayerContext()
     const isPlay = useMemo(()=>{
       return audio.id === activeTrack?.id && playBackState === State.Playing
     }, [audio.id, activeTrack?.id, playBackState])
@@ -26,6 +29,11 @@ export const CardAudio = ({ audio, active }:{audio: IAudiData, active?: number |
     return(
       <TouchableOpacity style={styles.item} onPress={gotoAudio}>
           <View style={styles.header}>
+            {
+              audioDownload[audio.id] && (
+                <Upload width={12} height={12}  fill={'#fff'} style={styles.upload} />
+              )
+            }
             <AudioIcon width={54} height={54} fill={"#000"} style={styles.image}/>
           </View>
           <View style={styles.body}>

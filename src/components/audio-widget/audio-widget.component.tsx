@@ -4,11 +4,12 @@ import { State } from "react-native-track-player";
 import Play from "assets/svg/play-second.svg";
 import Pause from "assets/svg/pause-second.svg";
 import { formatSecondsToTime } from "utils/format.utils";
-import { useEffect, useRef } from "react";
+import { useEffect, useMemo, useRef } from "react";
 import Animated, { useSharedValue, withTiming } from "react-native-reanimated";
 import { ScreenName } from "navigation/navigation.model";
 import { navigationRef } from "navigation/navigation.utils";
 import { IAudiData } from "models";
+import { useNetInfo } from "@react-native-community/netinfo";
 
 export interface IAudioWidgetProps{
     isWidgetPlayerHidden: boolean,
@@ -32,7 +33,7 @@ const ActionPlayIcon = ({position, playBackState}:{position: number, playBackSta
 export const AudioWidget = ({isWidgetPlayerHidden, position ,togglePlayback, activeTrack , playBackState}: IAudioWidgetProps) =>{
     const translateY = useSharedValue(90);
     const init = useRef(false);
-    //console.log(activeTrack)
+    const { isConnected } = useNetInfo();
     useEffect(()=>{
         init.current = true;
     }, [])
@@ -56,10 +57,22 @@ export const AudioWidget = ({isWidgetPlayerHidden, position ,togglePlayback, act
         }
 
       }
+    const disabled = useMemo(()=>{
+        if(activeTrack === undefined){
+            return true
+        }
+
+        if(isConnected === false && activeTrack && activeTrack?.url.indexOf("file")){
+            return true
+        }
+
+        return false;
+    }, [isConnected, activeTrack])
 
     return(
         <Animated.View style={[styles.container, { transform: [{ translateY }] }]}>
-             <TouchableOpacity 
+             <TouchableOpacity
+                disabled={disabled} 
                 style={styles.btn} 
                 onPress={()=> togglePlayback(playBackState)}
             >

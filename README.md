@@ -19,10 +19,9 @@ npm run ios
 - react-reduxс
 
 ## To do
-- launch downloaded tracks without the Internet
 - restart the page.
-- leaders during queries
 - uploading tracks to a playlist by scrolling the list
+- add file cache updates when downloading it
 
 <style type="text/css">
     img {

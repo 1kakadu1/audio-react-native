@@ -1,5 +1,6 @@
 import { IAudiData } from 'models'
 import { useEffect, useMemo, useRef, useState } from 'react'
+import Snackbar from 'react-native-snackbar'
 import TrackPlayer, {
     AppKilledPlaybackBehavior,
     Capability,
@@ -68,39 +69,71 @@ export const useAudioControl = () => {
     if (disabled || activeTrack === null) {
       return
     }
-
-    if (playback === State.Paused || playback === State.Ready) {
-      await TrackPlayer.play()
-    } else if (playback === State.Ended) {
-      await skipToPosition(0)
-      await TrackPlayer.play()
-    } else {
-      await TrackPlayer.pause()
+    try {
+      console.log('WWWWWWW')
+      if (playback === State.Paused || playback === State.Ready) {
+        await TrackPlayer.play()
+      } else if (playback === State.Ended) {
+        await skipToPosition(0)
+        await TrackPlayer.play()
+      } else {
+        await TrackPlayer.pause()
+      }
+    } catch (error) {
+      Snackbar.show({
+        text: "Error play: "+ JSON.stringify(error),
+        duration: Snackbar.LENGTH_SHORT,
+      });
     }
+
   }
 
   const skipToTrack = async (index: number, isPlayStart = true) => {
-    const queue = await TrackPlayer.getQueue()
-    const nextTrack = queue[index]
-    await TrackPlayer.skip(index, audioProgress[nextTrack?.id] ?? 0)
-    if (playBackState && isPlayStart) {
-      await TrackPlayer.play()
+    try {
+      const queue = await TrackPlayer.getQueue()
+      const nextTrack = queue[index]
+      await TrackPlayer.skip(index, audioProgress[nextTrack?.id] ?? 0)
+      if (playBackState && isPlayStart) {
+        await TrackPlayer.play()
+      }
+    } catch (error) {
+      Snackbar.show({
+        text: "Skip to track: "+ JSON.stringify(error),
+        duration: Snackbar.LENGTH_SHORT,
+      });
     }
+
   }
 
   const skipToPrev = async (disabled?: boolean | null) => {
     if (!disabled) {
-      const queue = await TrackPlayer.getQueue()
-      const id = queue[queue.findIndex((item) => item.id === activeTrack?.id) - 1].id
-      await TrackPlayer.skipToPrevious(audioProgress[id] ?? 0)
+      try {
+        const queue = await TrackPlayer.getQueue()
+        const id = queue[queue.findIndex((item) => item.id === activeTrack?.id) - 1].id
+        await TrackPlayer.skipToPrevious(audioProgress[id] ?? 0)
+      } catch (error) {
+        Snackbar.show({
+          text: "Skip to prev error: "+ JSON.stringify(error),
+          duration: Snackbar.LENGTH_SHORT,
+        });
+      }
+
     }
   }
 
   const skipToNext = async (disabled?: boolean | null) => {
     if (!disabled) {
-      const queue = await TrackPlayer.getQueue()
-      const id = queue[queue.findIndex((item) => item.id === activeTrack?.id) + 1].id
-      await TrackPlayer.skipToNext(audioProgress[id] ?? 0)
+      try {
+        const queue = await TrackPlayer.getQueue()
+        const id = queue[queue.findIndex((item) => item.id === activeTrack?.id) + 1].id
+        await TrackPlayer.skipToNext(audioProgress[id] ?? 0)
+      } catch (error) {
+        Snackbar.show({
+          text: "Skip to next error: "+ JSON.stringify(error),
+          duration: Snackbar.LENGTH_SHORT,
+        });
+      }
+
     }
   }
 
@@ -123,7 +156,7 @@ export const useAudioControl = () => {
     }
     setIsPlayerReady(isSetup)
   }
-
+  
   const clearPlaylist = async () => {
     if (isPlayerReady) {
       await TrackPlayer.stop()
@@ -140,7 +173,6 @@ export const useAudioControl = () => {
       url: audioProgress[item.id] !== undefined ? audioDownload[item.id]?.file || item.previews['preview-hq-mp3'] : item.previews['preview-hq-mp3'] || item.previews['preview-hq-ogg'],
     }))
     prevPlaylist.current = playlist;
-    console.log(tracks)
     setup(tracks)
   }
   const changePlaylist = ()=>{

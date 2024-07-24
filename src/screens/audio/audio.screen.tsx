@@ -2,7 +2,7 @@ import { StatusBar } from "expo-status-bar"
 import { View, Text, TouchableOpacity } from "react-native"
 import { RootStackParamList, ScreenName } from "../../navigation/navigation.model";
 import { NativeStackScreenProps } from "@react-navigation/native-stack";
-import React, { useEffect, useRef, useState } from "react";
+import React, { useEffect, useMemo, useRef, useState } from "react";
 import { setCurrentTrack } from "store/audio/audio.slice";
 import { useAppDispatch, useAppSelector } from "store";
 import { State } from "react-native-track-player";
@@ -51,6 +51,17 @@ export function AudioScreen({ route }: AudioScreenNavigationProp) {
     const { download, downloadProgress } = useDownloadAudio();
     const isFirstRender = useRef(false);
 
+    const disabled = useMemo(()=>{
+      if(activeTrack === undefined){
+          return true
+      }
+
+      if(isConnected === false && activeTrack && activeTrack?.url.indexOf("file")){
+          return true
+      }
+
+      return false;
+  }, [isConnected, activeTrack])
     const dispatch = useAppDispatch();
 
     useEffect(()=>{
@@ -85,6 +96,10 @@ export function AudioScreen({ route }: AudioScreenNavigationProp) {
         setIsWidgetPlayerHidden(false)
       }
     }, [])
+
+    useEffect(()=>{
+      setDisabledInternal(disabled);
+    }, [disabled])
 
     const onPrev = ()=>{
       if(isFirstTrack){
@@ -155,22 +170,24 @@ export function AudioScreen({ route }: AudioScreenNavigationProp) {
                 {
                   activeTrack && downloadProgress[activeTrack?.id] && downloadProgress[activeTrack?.id] !== 100 ? <Text>{(downloadProgress[activeTrack?.id]*100).toFixed(0)}%</Text> : null
                 }
-                <TouchableOpacity onPress={()=>{
+                <TouchableOpacity 
+                disabled={disabled}
+                onPress={()=>{
                   activeTrack && download(activeTrack)
                 }}>
                   { activeTrack && audioDownload[activeTrack?.id] ? <Upload width={30} height={30} /> : <Download width={30} height={30} />}  
                 </TouchableOpacity>
               </View>
               <View style={styles.actions__nav}>
-                <TouchableOpacity style={styles.actions__nav__prev} onPress={onPrev}>
+                <TouchableOpacity disabled={disabled} style={styles.actions__nav__prev} onPress={onPrev}>
                   <Prev width={SIZE_ICON} height={SIZE_ICON} />
                 </TouchableOpacity>
-                <TouchableOpacity style={styles.actions__nav__play} onPress={()=> togglePlayback(playBackState)}>
+                <TouchableOpacity disabled={disabled} style={styles.actions__nav__play} onPress={()=> togglePlayback(playBackState)}>
                   {
                     playBackState === State.Playing ? <Pause width={SIZE_ICON* 1.5} height={SIZE_ICON* 1.5} /> : <Play width={SIZE_ICON * 1.5} height={SIZE_ICON * 1.5} />
                   }
                 </TouchableOpacity>
-                <TouchableOpacity style={styles.actions__nav__prev} onPress={onNext}>
+                <TouchableOpacity disabled={disabled} style={styles.actions__nav__prev} onPress={onNext}>
                   <Next width={SIZE_ICON} height={SIZE_ICON} />
                 </TouchableOpacity>
               </View>
