@@ -70,7 +70,6 @@ export const useAudioControl = () => {
       return
     }
     try {
-      console.log('WWWWWWW')
       if (playback === State.Paused || playback === State.Ready) {
         await TrackPlayer.play()
       } else if (playback === State.Ended) {

@@ -11,5 +11,9 @@ export interface IAudioState{
     audioDownload: {
         [key: number]: IAudiData
     }
+    filter:{
+        page: number,
+        count: number
+    }
 }
 

@@ -19,7 +19,6 @@ npm run ios
 - react-reduxс
 
 ## To do
-- restart the page.
 - uploading tracks to a playlist by scrolling the list
 - add file cache updates when downloading it
 

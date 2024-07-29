@@ -1,14 +1,13 @@
 
 import { StatusBar } from "expo-status-bar"
-import { FlatList, Text, View, ActivityIndicator} from "react-native";
+import { FlatList, Text, View, ActivityIndicator, RefreshControl} from "react-native";
 import { IHomeScreenPropsHomeScreenNavigationProp } from "../../navigation/navigation.model";
 import { useAppDispatch, useAppSelector } from "../../store";
-import { useEffect } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { getAudioList } from "../../store/audio/audio.thunk";
 import { IAudiData } from "../../models/audio";
 import { CardAudio } from "../../components/card/card-audio.component";
 import { useAudioPlayerContext } from "contexts/audio/audio.context";
-import LoadingIcon from "assets/svg/loading.svg"
 import Snackbar from "react-native-snackbar";
 import { useNetInfo } from "@react-native-community/netinfo";
 
@@ -18,10 +17,18 @@ export function HomeScreen( { navigation, route }: IHomeScreenPropsHomeScreenNav
     const { isWidgetPlayerHidden } = useAudioPlayerContext();
     const { isConnected } = useNetInfo();
     const dispath = useAppDispatch();
-    
+    const [refreshing, setRefreshing] = useState(false);
+
+    const onRefresh = useCallback(() => {
+      setRefreshing(true);
+       dispath(getAudioList({q: search || "piano", page: 1})).then(()=>{
+        setRefreshing(false);
+       }) 
+    }, [search]);
+
     useEffect(()=>{
         if(!isLoading){
-           dispath(getAudioList(search || "piano")) 
+           dispath(getAudioList({q: search || "piano", page: 1}))
         }
     }, [])
 
@@ -70,6 +77,8 @@ export function HomeScreen( { navigation, route }: IHomeScreenPropsHomeScreenNav
                         renderItem={({item}: {item: IAudiData}) => <CardAudio audio={item} active={currentTrack}/>}
                         keyExtractor={item => item.id.toString()}
                         extraData={currentTrack}
+                        refreshControl={
+                            <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />}
                     />
                 )
             }

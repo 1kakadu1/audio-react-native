@@ -2,7 +2,7 @@ import { createSlice } from '@reduxjs/toolkit'
 import type { PayloadAction } from '@reduxjs/toolkit'
 import { AUDIO_MOCK, INITIAL_STATE, SLICE_NAME } from './audio.const'
 import { IAudiData } from '../../models/audio'
-import { getAudioList } from './audio.thunk'
+import { getAudioList, loadMoreAudioList } from './audio.thunk'
 
 export const audioSlice = createSlice({
     name: SLICE_NAME,
@@ -12,6 +12,7 @@ export const audioSlice = createSlice({
         state.isLoading = action.payload
       },
       setAudioList: (state,  action: PayloadAction<IAudiData[]>) => {
+        state.filter.page = 1;
         state.audio = action.payload;
       },
       setAudioProgress: (state, { payload }: PayloadAction<{id: number, progress: number}>) => {
@@ -22,6 +23,12 @@ export const audioSlice = createSlice({
       },
       addAudioDowload: (state, { payload }:  PayloadAction<IAudiData>) => {
         state.audioDownload = {...state.audioDownload, [payload.id]: payload} 
+      },
+      setCountAudioList: (state, { payload }: PayloadAction<number>)=>{
+        state.filter.count = payload
+      },
+      setPageAudioList: (state, { payload }: PayloadAction<number>)=>{
+        state.filter.page = payload
       }
     },
     extraReducers:(builder) => {
@@ -31,17 +38,34 @@ export const audioSlice = createSlice({
       builder.addCase(getAudioList.fulfilled, (state, { payload }) => {
         state.audio = [
         ...AUDIO_MOCK,
-        ...payload
+        ...payload.results
         ];
+        state.filter.count = payload.count;
         state.isLoading = false
       })
       builder.addCase(getAudioList.rejected, (state, { payload }) => {
         state.error = payload
         state.isLoading = false
       })
+
+      builder.addCase(loadMoreAudioList.pending, (state) => {
+        state.isLoading = true
+      })
+      builder.addCase(loadMoreAudioList.fulfilled, (state, { payload }) => {
+        state.audio = [
+        ...state.audio,
+        ...payload.results
+        ];
+        state.filter.count = payload.count;
+        state.isLoading = false
+      })
+      builder.addCase(loadMoreAudioList.rejected, (state, { payload }) => {
+        state.error = payload
+        state.isLoading = false
+      })
     }
   })
 
-  export const { setAudioList , setAudioProgress, setCurrentTrack, setAudioLoading, addAudioDowload } = audioSlice.actions
+  export const { setAudioList , setAudioProgress, setCurrentTrack, setAudioLoading, addAudioDowload, setPageAudioList, setCountAudioList } = audioSlice.actions
   
   export default audioSlice.reducer

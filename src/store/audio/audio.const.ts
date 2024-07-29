@@ -7,7 +7,11 @@ export const INITIAL_STATE: IAudioState = {
     isLoading: false,
     error: undefined,
     audioProgress: {},
-    audioDownload: {}
+    audioDownload: {},
+    filter:{
+      page: 1,
+      count: 0,
+    }
 }
   
 export const SLICE_NAME = "audio";

@@ -42,9 +42,9 @@ axios.interceptors.response.use(
 
 class AudioApi{
     private base_url: string = `https://freesound.org/apiv2/search/text/?token=${Env.API_SOUND}&fields=url,download,previews,id,name,tags,type,description,duration`
-    getAudioList = async (q: string): Promise<IAudiData[]> =>{
+    getAudioList = async (q: string, page = 1): Promise<IResponseApi<IAudiData[]>> =>{
         try{
-          const response = (await axios.get<IResponseApi<IAudiData[]>>(this.base_url+"&query="+q)).data.results
+          const response = (await axios.get<IResponseApi<IAudiData[]>>(this.base_url+"&query="+q+"&page="+page)).data
           //console.log("res",response)
           return response;
         } catch(e){

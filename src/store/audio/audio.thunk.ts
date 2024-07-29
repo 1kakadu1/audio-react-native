@@ -3,7 +3,12 @@ import { apiAudio } from "../../api/api-services";
 
 export const getAudioList = createAppAsyncThunk(
     'audio/getAudioList',
-    async (q: string, { rejectWithValue }) =>
-        apiAudio.getAudioList(q).catch((error) => rejectWithValue(error.message)),
+    async ({q, page = 1}:{q:string, page: number}, { rejectWithValue }) =>
+        apiAudio.getAudioList(q, page).catch((error) => rejectWithValue(error.message)),
   )
   
+  export const loadMoreAudioList = createAppAsyncThunk(
+    'audio/loadMoreAudioList',
+    async ({q, page}:{q:string, page: number}, { rejectWithValue }) =>
+        apiAudio.getAudioList(q, page).catch((error) => rejectWithValue(error.message)),
+  )
