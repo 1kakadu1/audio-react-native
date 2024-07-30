@@ -14,6 +14,7 @@ export interface IAudioState{
     filter:{
         page: number,
         count: number
-    }
+    },
+    insert: boolean
 }
 

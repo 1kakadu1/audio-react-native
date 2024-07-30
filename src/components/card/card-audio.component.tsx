@@ -8,12 +8,12 @@ import AudioIcon from "assets/svg/audio.svg";
 import PauseIcon from "assets/svg/pause.svg";
 import PlayIcon from "assets/svg/play.svg";
 import { State } from 'react-native-track-player';
-import { useMemo } from 'react';
+import { memo, useMemo } from 'react';
 import { useAudioPlayerContext } from 'contexts/audio/audio.context';
 import Upload from "assets/svg/upload.svg";
 import { useAppSelector } from 'store';
 
-export const CardAudio = ({ audio, active }:{audio: IAudiData, active?: number | null})=>{
+export const CardAudio = memo(({ audio, active }:{audio: IAudiData, active?: number | null})=>{
     const { audioDownload } = useAppSelector(state => state.audio);
     const  {playBackState, activeTrack } = useAudioPlayerContext()
     const isPlay = useMemo(()=>{
@@ -58,4 +58,4 @@ export const CardAudio = ({ audio, active }:{audio: IAudiData, active?: number |
 
       </TouchableOpacity>
     )
-}
+})

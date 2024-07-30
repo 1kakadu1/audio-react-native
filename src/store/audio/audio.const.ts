@@ -11,7 +11,8 @@ export const INITIAL_STATE: IAudioState = {
     filter:{
       page: 1,
       count: 0,
-    }
+    },
+    insert: false,
 }
   
 export const SLICE_NAME = "audio";

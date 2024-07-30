@@ -13,7 +13,7 @@ import TrackPlayer, {
     Event
   } from 'react-native-track-player'
 import { useAppDispatch, useAppSelector } from 'store'
-import { setAudioList, setAudioProgress, setCurrentTrack } from 'store/audio/audio.slice'
+import { setAudioList, setAudioProgress, setCurrentTrack, setInsdertAudio } from 'store/audio/audio.slice'
 
 export const capabilities = [Capability.Play, Capability.Pause, Capability.SkipToPrevious, Capability.SkipToNext]
 
@@ -38,7 +38,7 @@ async function addTrack(tracks: IAudiData[], insetToStart?: boolean) {
 
 
 export const useAudioControl = () => {
-  const { audio: playlist, currentTrack: currentStateTrack, audioProgress, audioDownload } = useAppSelector(store => store.audio);
+  const { audio: playlist, currentTrack: currentStateTrack, audioProgress, audioDownload , insert: isInsert} = useAppSelector(store => store.audio);
   const [isPlayerReady, setIsPlayerReady] = useState(false)
   const dispatch = useAppDispatch()
   const { state: playBackState } = usePlaybackState()
@@ -64,7 +64,16 @@ export const useAudioControl = () => {
     }
   }
 
-
+  const addTracks = async (audioList: IAudiData[], insetTo?: number) =>{
+    const tracks = audioList.map((item) => ({
+      ...item,
+      artwork: item?.image || undefined,
+      image: item.image,
+      url: audioProgress[item.id] !== undefined ? audioDownload[item.id]?.file || item.previews['preview-hq-mp3'] : item.previews['preview-hq-mp3'] || item.previews['preview-hq-ogg'],
+    }))
+    await TrackPlayer.add(tracks, insetTo);
+  }
+  
   const togglePlayback = async (playback?: State, disabled?: boolean | null) => {
     if (disabled || activeTrack === null) {
       return
@@ -175,8 +184,13 @@ export const useAudioControl = () => {
     setup(tracks)
   }
   const changePlaylist = ()=>{
-    if (playlist.length && JSON.stringify(playlist) !== JSON.stringify(prevPlaylist.current)) {
+    if (playlist.length && JSON.stringify(playlist) !== JSON.stringify(prevPlaylist.current) && !isInsert) {
       setupPLaylist(playlist)
+    }
+
+    if(isInsert){
+      dispatch(setInsdertAudio(false))
+      prevPlaylist.current = playlist;
     }
   }
 
@@ -227,6 +241,7 @@ export const useAudioControl = () => {
     changePlaylist,
     isLastTrack,
     isFirstTrack,
-    indexTrack
+    indexTrack,
+    addTracks
   }
 }

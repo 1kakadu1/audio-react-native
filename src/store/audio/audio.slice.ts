@@ -29,6 +29,9 @@ export const audioSlice = createSlice({
       },
       setPageAudioList: (state, { payload }: PayloadAction<number>)=>{
         state.filter.page = payload
+      },
+      setInsdertAudio: (state, { payload }: PayloadAction<boolean>)=>{
+        state.insert = payload
       }
     },
     extraReducers:(builder) => {
@@ -52,11 +55,13 @@ export const audioSlice = createSlice({
         state.isLoading = true
       })
       builder.addCase(loadMoreAudioList.fulfilled, (state, { payload }) => {
+        state.insert = true;
         state.audio = [
         ...state.audio,
         ...payload.results
         ];
         state.filter.count = payload.count;
+        state.filter.page = state.filter.page + 1;
         state.isLoading = false
       })
       builder.addCase(loadMoreAudioList.rejected, (state, { payload }) => {
@@ -66,6 +71,6 @@ export const audioSlice = createSlice({
     }
   })
 
-  export const { setAudioList , setAudioProgress, setCurrentTrack, setAudioLoading, addAudioDowload, setPageAudioList, setCountAudioList } = audioSlice.actions
+  export const { setInsdertAudio, setAudioList , setAudioProgress, setCurrentTrack, setAudioLoading, addAudioDowload, setPageAudioList, setCountAudioList } = audioSlice.actions
   
   export default audioSlice.reducer

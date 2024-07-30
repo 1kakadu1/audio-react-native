@@ -1,30 +1,51 @@
 
 import { StatusBar } from "expo-status-bar"
-import { FlatList, Text, View, ActivityIndicator, RefreshControl} from "react-native";
+import { FlatList, View, ActivityIndicator, RefreshControl} from "react-native";
 import { IHomeScreenPropsHomeScreenNavigationProp } from "../../navigation/navigation.model";
 import { useAppDispatch, useAppSelector } from "../../store";
-import { useCallback, useEffect, useState } from "react";
-import { getAudioList } from "../../store/audio/audio.thunk";
+import { memo, useCallback, useEffect, useState } from "react";
+import { getAudioList, loadMoreAudioList } from "../../store/audio/audio.thunk";
 import { IAudiData } from "../../models/audio";
 import { CardAudio } from "../../components/card/card-audio.component";
 import { useAudioPlayerContext } from "contexts/audio/audio.context";
 import Snackbar from "react-native-snackbar";
 import { useNetInfo } from "@react-native-community/netinfo";
 
+const renderItem = ({item}: {item: IAudiData}) => <CardAudio audio={item} />
+
 export function HomeScreen( { navigation, route }: IHomeScreenPropsHomeScreenNavigationProp) {
-    const {  isLoading, audio, currentTrack , error} = useAppSelector((state) => state.audio);
+    const {  isLoading, audio, currentTrack , error, filter} = useAppSelector((state) => state.audio);
     const { search } = useAppSelector(state => state.search);
-    const { isWidgetPlayerHidden } = useAudioPlayerContext();
+    const { isWidgetPlayerHidden, addTracks } = useAudioPlayerContext();
     const { isConnected } = useNetInfo();
     const dispath = useAppDispatch();
     const [refreshing, setRefreshing] = useState(false);
 
     const onRefresh = useCallback(() => {
-      setRefreshing(true);
-       dispath(getAudioList({q: search || "piano", page: 1})).then(()=>{
-        setRefreshing(false);
-       }) 
-    }, [search]);
+        if(!refreshing && isConnected){
+            setRefreshing(true);
+            dispath(getAudioList({q: search || "piano", page: 1})).then(()=>{
+             setRefreshing(false);
+            })
+        }
+ 
+    }, [search, isConnected]);
+
+    const handlerLoadMore = () =>{
+        if(!isLoading && !refreshing && isConnected){
+            setRefreshing(true);
+            dispath(
+                loadMoreAudioList({q: search || "piano" , page: filter.page + 1})
+            ).then((res) =>{
+                if(typeof res.payload !== 'string' && res.payload){
+                    console.log(res.payload.count)
+                    addTracks(res.payload.results);
+                }
+            }).finally(()=>{
+                setRefreshing(false);
+            })
+        }  
+    }
 
     useEffect(()=>{
         if(!isLoading){
@@ -72,9 +93,11 @@ export function HomeScreen( { navigation, route }: IHomeScreenPropsHomeScreenNav
             {
                 audio.length > 0  && (
                     <FlatList
+                        onEndReached={handlerLoadMore}
+                        onEndReachedThreshold={0.1}
                         contentContainerStyle={{paddingBottom: isWidgetPlayerHidden ? 0 : 80, paddingTop: isLoading &&  audio.length > 0 ? 30 : 0}}
                         data={audio}
-                        renderItem={({item}: {item: IAudiData}) => <CardAudio audio={item} active={currentTrack}/>}
+                        renderItem={renderItem}
                         keyExtractor={item => item.id.toString()}
                         extraData={currentTrack}
                         refreshControl={

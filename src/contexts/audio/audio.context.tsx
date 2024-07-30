@@ -37,7 +37,8 @@ export const AudioPlayerProvider: FC<PropsWithChildren> = ({ children }) => {
     isFirstTrack,
     isLastTrack,
     indexTrack,
-    changePlaylist
+    changePlaylist,
+    addTracks
   } = useAudioControl();
 
   useEffect(() => {
@@ -81,7 +82,8 @@ export const AudioPlayerProvider: FC<PropsWithChildren> = ({ children }) => {
         isFirstTrack,
         isLastTrack,
         indexTrack,
-        changePlaylist
+        changePlaylist,
+        addTracks
       }}
     >
       <View style={{flex: 1, overflow: "hidden"}}>

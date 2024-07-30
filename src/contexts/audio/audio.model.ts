@@ -18,5 +18,6 @@ export interface AudioPlayerContextType {
     isFirstTrack: boolean, 
     isLastTrack: boolean,
     indexTrack: number,
-    changePlaylist: ()=> void
+    changePlaylist: ()=> void,
+    addTracks: (audioList: IAudiData[], insetTo?: number) => Promise<void>
   }
