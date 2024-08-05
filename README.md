@@ -31,3 +31,7 @@ npm run ios
 - expo-file-system
 - react-redux
 - @react-native-community/netinfo
+
+## fix
+- update the track url when deleting it from the cache
+- add tracks from the cache to the queue with the current playlist update

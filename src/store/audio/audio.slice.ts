@@ -24,6 +24,14 @@ export const audioSlice = createSlice({
       addAudioDowload: (state, { payload }:  PayloadAction<IAudiData>) => {
         state.audioDownload = {...state.audioDownload, [payload.id]: payload} 
       },
+      removeAudioDowload: (state, { payload }:  PayloadAction<IAudiData>) => {
+        console.log("aaaaaa",state.audioDownload[payload.id])
+        if(state.audioDownload[payload.id]){
+          const audio = {...state.audioDownload};
+          delete audio[payload.id];
+          state.audioDownload = {...audio};
+        }
+      },
       setCountAudioList: (state, { payload }: PayloadAction<number>)=>{
         state.filter.count = payload
       },
@@ -71,6 +79,6 @@ export const audioSlice = createSlice({
     }
   })
 
-  export const { setInsdertAudio, setAudioList , setAudioProgress, setCurrentTrack, setAudioLoading, addAudioDowload, setPageAudioList, setCountAudioList } = audioSlice.actions
+  export const { setInsdertAudio, setAudioList , setAudioProgress, setCurrentTrack, setAudioLoading, addAudioDowload, setPageAudioList, setCountAudioList, removeAudioDowload } = audioSlice.actions
   
   export default audioSlice.reducer

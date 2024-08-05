@@ -64,6 +64,14 @@ export const useAudioControl = () => {
     }
   }
 
+  const findTrackById = (id: number)=>{
+    const index = playlist.findIndex(item => item.id === id);
+    return {
+      indexTrack: index,
+      track: index !== -1 ? playlist[index] : null
+    }
+  }
+
   const addTracks = async (audioList: IAudiData[], insetTo?: number) =>{
     const tracks = audioList.map((item) => ({
       ...item,
@@ -72,6 +80,21 @@ export const useAudioControl = () => {
       url: audioProgress[item.id] !== undefined ? audioDownload[item.id]?.file || item.previews['preview-hq-mp3'] : item.previews['preview-hq-mp3'] || item.previews['preview-hq-ogg'],
     }))
     await TrackPlayer.add(tracks, insetTo);
+  }
+
+  const updateMetadataForTrack  = async ( metadata: IAudiData) =>{
+    try{
+      const  { indexTrack } = findTrackById(activeTrack.id);
+      if(indexTrack !== -1){
+        await TrackPlayer.updateMetadataForTrack(indexTrack, metadata);
+      }
+      
+    }catch(e){
+      Snackbar.show({
+        text: "Error updateMetadataForTrack: "+ JSON.stringify(e),
+        duration: Snackbar.LENGTH_SHORT,
+      });
+    }
   }
   
   const togglePlayback = async (playback?: State, disabled?: boolean | null) => {
@@ -242,6 +265,8 @@ export const useAudioControl = () => {
     isLastTrack,
     isFirstTrack,
     indexTrack,
-    addTracks
+    addTracks,
+    findTrackById,
+    updateMetadataForTrack
   }
 }

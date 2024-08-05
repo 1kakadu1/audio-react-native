@@ -3,7 +3,7 @@ import { useAppDispatch, useAppSelector } from 'store'
 import { IAudiData } from 'models'
 import { useDownloadContext } from './dowlnoad.context'
 import { convertTrackName, deleteFile } from './dowload.utils'
-import { addAudioDowload } from 'store/audio/audio.slice'
+import { addAudioDowload, removeAudioDowload } from 'store/audio/audio.slice'
 
 export const useDownloadAudio = () => {
   const dispatch = useAppDispatch()
@@ -36,5 +36,17 @@ export const useDownloadAudio = () => {
     }
   }
 
-  return { download, downloadProgress,  }
+  const onDeleteFile = (audio: IAudiData, callback?: ()=> void)=>{
+    console.log(audio.file)
+    if(audio.file){
+      deleteFile(audio.file);
+      dispatch(removeAudioDowload(audio));
+      callback && callback();
+    } else{
+      console.log("Error remove file")
+    }
+    
+  }
+
+  return { download, downloadProgress, onDeleteFile }
 }

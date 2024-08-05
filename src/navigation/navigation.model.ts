@@ -5,14 +5,16 @@ export enum ScreenName{
     home = "Home",
     about = "About",
     audio = "Audio",
-    search = "Search"
+    search = "Search",
+    download = "Download"
 }
 
 export type RootStackParamList = {
     [ScreenName.home]: undefined;
     [ScreenName.about]: { title: string };
     [ScreenName.audio]: { item: IAudiData };
-    [ScreenName.search]: undefined
+    [ScreenName.search]: undefined,
+    [ScreenName.download]: undefined
 };
 
 
