@@ -17,7 +17,7 @@ import { useDownloadAudio } from 'contexts/dowlnoad/dowload.hook';
 
 export const CardAudio = memo(({ audio, isDelete = false }:{audio: IAudiData, isDelete?: boolean})=>{
     const { audioDownload } = useAppSelector(state => state.audio);
-    const { playBackState, activeTrack } = useAudioPlayerContext();
+    const { playBackState, activeTrack, updateUrlTrack } = useAudioPlayerContext();
     const { onDeleteFile } = useDownloadAudio();
 
     const isPlay = useMemo(()=>{
@@ -32,7 +32,9 @@ export const CardAudio = memo(({ audio, isDelete = false }:{audio: IAudiData, is
     }
 
     const onDelete = ()=>{
-      onDeleteFile(audio)
+      onDeleteFile(audio, ()=>{
+        updateUrlTrack(audio);
+      })
     }
      
     return(

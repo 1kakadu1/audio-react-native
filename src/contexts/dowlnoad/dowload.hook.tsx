@@ -32,12 +32,12 @@ export const useDownloadAudio = () => {
     } catch (e) {
       deleteFile(fileUri)
       setDownloadQueue([])
-      console.log("Error", e)
+      console.log("Error delete file", e)
     }
   }
 
   const onDeleteFile = (audio: IAudiData, callback?: ()=> void)=>{
-    console.log(audio.file)
+    console.log("onDeleteFile", audio.file)
     if(audio.file){
       deleteFile(audio.file);
       dispatch(removeAudioDowload(audio));

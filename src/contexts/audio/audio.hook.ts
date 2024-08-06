@@ -64,11 +64,36 @@ export const useAudioControl = () => {
     }
   }
 
-  const findTrackById = (id: number)=>{
-    const index = playlist.findIndex(item => item.id === id);
-    return {
-      indexTrack: index,
-      track: index !== -1 ? playlist[index] : null
+  const findTrackById =  async (id: number)=>{
+    try {
+      const index = playlist.findIndex(item => item.id === id);
+      const queue = await TrackPlayer.getQueue();
+      const indexQueue = queue.findIndex((item)=> item.id === id)
+      return {
+        indexTrack: index,
+        indexQueue,
+        queuLength: queue.length,
+        track: index !== -1 ? playlist[index] : null
+      }
+    } catch (error) {
+      throw error
+    }
+
+  }
+
+  const updateUrlTrack = async (audio: IAudiData) =>{
+    try {
+      const { indexQueue, indexTrack, queuLength } = await findTrackById(audio.id);
+      if(indexTrack !== -1 && indexQueue !== -1){
+        await TrackPlayer.remove(indexQueue);
+        const insertTrackIndex = await TrackPlayer.add({...audio, url: audio.previews["preview-hq-mp3"]}, indexQueue);
+        console.log(indexQueue, insertTrackIndex);
+      }
+    } catch (e) {
+      Snackbar.show({
+        text: "Error update url: "+ JSON.stringify(e),
+        duration: Snackbar.LENGTH_SHORT,
+      });
     }
   }
 
@@ -84,7 +109,7 @@ export const useAudioControl = () => {
 
   const updateMetadataForTrack  = async ( metadata: IAudiData) =>{
     try{
-      const  { indexTrack } = findTrackById(activeTrack.id);
+      const  { indexTrack } = await findTrackById(activeTrack.id);
       if(indexTrack !== -1){
         await TrackPlayer.updateMetadataForTrack(indexTrack, metadata);
       }
@@ -267,6 +292,7 @@ export const useAudioControl = () => {
     indexTrack,
     addTracks,
     findTrackById,
-    updateMetadataForTrack
+    updateMetadataForTrack,
+    updateUrlTrack
   }
 }

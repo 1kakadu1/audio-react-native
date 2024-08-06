@@ -19,5 +19,6 @@ export interface AudioPlayerContextType {
     isLastTrack: boolean,
     indexTrack: number,
     changePlaylist: ()=> void,
+    updateUrlTrack: (audio: IAudiData) => Promise<void>,
     addTracks: (audioList: IAudiData[], insetTo?: number) => Promise<void>
   }

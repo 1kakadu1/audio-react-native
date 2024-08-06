@@ -25,7 +25,6 @@ export const audioSlice = createSlice({
         state.audioDownload = {...state.audioDownload, [payload.id]: payload} 
       },
       removeAudioDowload: (state, { payload }:  PayloadAction<IAudiData>) => {
-        console.log("aaaaaa",state.audioDownload[payload.id])
         if(state.audioDownload[payload.id]){
           const audio = {...state.audioDownload};
           delete audio[payload.id];

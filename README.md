@@ -33,5 +33,6 @@ npm run ios
 - @react-native-community/netinfo
 
 ## fix
-- update the track url when deleting it from the cache
 - add tracks from the cache to the queue with the current playlist update
+## Warning
+the ios emulator deletes the cache from the audio itself upon completion
